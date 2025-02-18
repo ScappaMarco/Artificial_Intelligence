@@ -29,10 +29,11 @@ mlp = ImageClassifier() #istanza della rerte neurale creata
 loss_func = nn.CrossEntropyLoss() #loss
 optimizer = Adam(mlp.parameters(), lr=0.0001) #optimization
 
+
 print("INIZIO FASE DI TRAINING E VALIDATION")
 print("---------------------------------------------------------------")
 #adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
-'''
+
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
@@ -83,17 +84,22 @@ with torch.no_grad():
     test_accuracy = correct_test / test_totali
     print(f"Test accuracy = {test_accuracy * 100:.2f}")
 
+#salvataggio modello con wb = write binary
 with open('classification_model.pt', 'wb') as f:
     save(mlp.state_dict(), f)
+
+#codice di prova del modello con delle foto prese dal dataset di MNIST
 '''
 transform = Compose([
     Resize((28, 28)),
-    Grayscale(num_output_channels=1),  # Ridimensiona l'immagine a 28x28
-    ToTensor()         # Converti l'immagine in un tensore
+    Grayscale(num_output_channels=1),  
+    ToTensor()
 ])
+
 with open('classification_model.pt', 'rb') as f:
     mlp.load_state_dict(load(f))
-    img = Image.open('images.png')
+    img = Image.open('Examples/image_7.png')
     img_tensor = transform(img).unsqueeze(0)
 
-    print(torch.argmax(mlp(img_tensor)))
+    print(mlp(img_tensor))
+'''
