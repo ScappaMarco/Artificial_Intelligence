@@ -25,16 +25,22 @@ def vincolo_posti(assegnazione, nome_lezione, lezioni, aule):
 
     return aula["capienza"] >= lezione["studenti_previsti"]
 
-def vincolo_aule(*assegnaioni):
-    occupazione = {}
+#questo vincolo serve a non far sovrapporre lezioni negli stessi timeslot / aule
+def vincolo_limita_domini(*assegnazioni):
+    occupazione = {} #questi dizionario tiene traccia delle aule / timeslot occupati
 
-    for (aula, slots) in assegnaioni:
+    for assegnazione in assegnazioni:
+        if assegnazione is None:
+            continue  
+
+        _, slots = assegnazione
+
         for slot in slots:
-            if(aula, slot) in occupazione:
-                return False
-            occupazione[(aula, slot)] = True
-    return True
+            if slot in occupazione:
+                return False  
+            occupazione[slot] = True  
 
+    return True 
 
 def resolver(lezioni, aule):
     problema = csp.Problem()
@@ -45,8 +51,8 @@ def resolver(lezioni, aule):
     
     for lezione in lezioni:
         problema.addConstraint(lambda assegnazione, l=lezione["nome_lezione"]: vincolo_posti(assegnazione=assegnazione, nome_lezione=l, lezioni=lezioni, aule=aule), [lezione["nome_lezione"]])
-    
-    problema.addConstraint(vincolo_aule, tuple(lezione["nome_lezione"] for lezione in lezioni))
+        
+    problema.addConstraint(vincolo_limita_domini, tuple(lezione["nome_lezione"] for lezione in lezioni))
 
     #print("Variabili: ", problema._variables)
     #print("Vincoli: ", problema._constraints)
@@ -57,7 +63,7 @@ def resolver(lezioni, aule):
 lezioni = [
         {"nome_lezione":"Analisi 1", "durata":2, "studenti_previsti":60},
         {"nome_lezione":"Programmazione ad Oggetti", "durata":3, "studenti_previsti":40},
-        {"nome_lezione":"Intelligenza Artificiale", "durata":2, "studenti_previsti":35},
+        {"nome_lezione":"Intelligenza Artificiale", "durata":2, "studenti_previsti": 110},
         {"nome_lezione":"Algorimi e Strutture Dati", "durata":2, "studenti_previsti":100}
         ]
 
@@ -68,4 +74,5 @@ aule = [
     ]
 
 solution = resolver(lezioni=lezioni, aule=aule)
+solution.__reversed__()
 print(solution)
