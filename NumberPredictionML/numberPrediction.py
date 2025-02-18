@@ -7,6 +7,7 @@ import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader, random_split
 from neuralNetwork import ImageClassifier #classe della neural network definita da me
+import matplotlib.pyplot as plt
 
 #definzizione dataset e dataloader per il set di dati per il training - Il full_train_dataset verrà poi suddiviso in train_dataset e validation_dataset
 full_train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=ToTensor()) #train set - train = True
@@ -32,11 +33,14 @@ optimizer = Adam(mlp.parameters(), lr=0.0001) #optimization
 
 print("INIZIO FASE DI TRAINING E VALIDATION")
 print("---------------------------------------------------------------")
-#adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
 
+#adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
+train_losses = [] #sarà utile dopo per mostrare il grafico della loss function
+validation_accuarcies = []
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
+    epoch_train_loss = 0.0
     for train_images, train_labels in train_loader:
         predizione_train = mlp(train_images)
         loss = loss_func(predizione_train, train_labels)
@@ -45,6 +49,11 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        epoch_train_loss += loss.item()
+
+    train_losses.append(loss.item())
+
     #qui va la fase di validation
     mlp.eval()
     loss_totale = 0.0
@@ -63,10 +72,36 @@ for epoch in range(num_epochs):
     validation_los = loss_totale / len(validation_loader)
     accuracy = correct / totali
 
+    validation_accuarcies.append(accuracy)
+
     print(f"Epoca numero {epoch + 1} / {num_epochs}, con loss = {loss.item()}")
     print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
     print("---------------------------------------------------------------")
 
+'''
+#sezione dedicata alla visualizzazione della loss function e dell'accuracy
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+ax1.plot(range(1, num_epochs + 1), train_losses, label='Training Loss', color='blue', marker='o')
+ax1.set_xlabel('Epoche')
+ax1.set_ylabel('Loss', color='blue')
+ax1.tick_params(axis='y', labelcolor='blue')
+
+ax2 = ax1.twinx()
+ax2.plot(range(1, num_epochs + 1), validation_accuarcies, label='Training Accuracy', color='red', marker='s')
+ax2.set_ylabel('Accuracy (%)', color='red')
+ax2.tick_params(axis='y', labelcolor='red')
+
+plt.title('Training Loss e Accuracy per Epoca')
+fig.legend(loc='upper right')
+
+plt.grid(True)
+
+plt.show()
+'''
+
+print("INIZIO FASE DI TESTING")
+print("---------------------------------------------------------------")
 #adesso comincia la parte di test
 mlp.eval()
 test_loss = 0.0
