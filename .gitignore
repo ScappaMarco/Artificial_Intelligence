@@ -1,3 +1,5 @@
 .csp
 NumberPredictionML/data
 NumberPredictionML/images.jpeg
+NumberPredictionML/classification_model.pt
+NumberPredictionML/Examples

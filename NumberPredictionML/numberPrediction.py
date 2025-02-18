@@ -1,6 +1,7 @@
 #dependencies
 from torchvision import datasets
-from torchvision.transforms import ToTensor
+from PIL import Image
+from torchvision.transforms import ToTensor, Compose, Resize, Grayscale
 from torch import nn, save, load
 import torch
 from torch.optim import Adam
@@ -31,6 +32,7 @@ optimizer = Adam(mlp.parameters(), lr=0.0001) #optimization
 print("INIZIO FASE DI TRAINING E VALIDATION")
 print("---------------------------------------------------------------")
 #adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
+'''
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
@@ -60,7 +62,7 @@ for epoch in range(num_epochs):
     validation_los = loss_totale / len(validation_loader)
     accuracy = correct / totali
 
-    print(f"Epoca numero {epoch} / {num_epochs}, con loss = {loss.item()}")
+    print(f"Epoca numero {epoch + 1} / {num_epochs}, con loss = {loss.item()}")
     print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
     print("---------------------------------------------------------------")
 
@@ -80,3 +82,18 @@ with torch.no_grad():
 
     test_accuracy = correct_test / test_totali
     print(f"Test accuracy = {test_accuracy * 100:.2f}")
+
+with open('classification_model.pt', 'wb') as f:
+    save(mlp.state_dict(), f)
+'''
+transform = Compose([
+    Resize((28, 28)),
+    Grayscale(num_output_channels=1),  # Ridimensiona l'immagine a 28x28
+    ToTensor()         # Converti l'immagine in un tensore
+])
+with open('classification_model.pt', 'rb') as f:
+    mlp.load_state_dict(load(f))
+    img = Image.open('images.png')
+    img_tensor = transform(img).unsqueeze(0)
+
+    print(torch.argmax(mlp(img_tensor)))
