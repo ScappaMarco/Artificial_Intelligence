@@ -28,13 +28,15 @@ mlp = ImageClassifier() #istanza della rerte neurale creata
 loss_func = nn.CrossEntropyLoss() #loss
 optimizer = Adam(mlp.parameters(), lr=0.0001) #optimization
 
+print("INIZIO FASE DI TRAINING E VALIDATION")
+print("---------------------------------------------------------------")
 #adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
-    for images, labels in train_loader:
-        predizione_train = mlp(images)
-        loss = loss_func(predizione_train, labels)
+    for train_images, train_labels in train_loader:
+        predizione_train = mlp(train_images)
+        loss = loss_func(predizione_train, train_labels)
 
         #backpropagation
         optimizer.zero_grad()
@@ -48,17 +50,33 @@ for epoch in range(num_epochs):
 
     #dopo ogni epoca di training il modello esegue una fase di validazione
     with torch.no_grad():
-        for images, labels in validation_loader:
-            predizione_validation = mlp(images)
-            loss_totale += loss_func(predizione_validation, labels).item()
+        for validation_images, validation_labels in validation_loader:
+            predizione_validation = mlp(validation_images)
+            loss_totale += loss_func(predizione_validation, validation_labels).item()
             _, valore_predizione = torch.max(predizione_validation, 1)
-            correct += (valore_predizione == labels).sum().item()
-            totali += labels.size(0)
+            correct += (valore_predizione == validation_labels).sum().item()
+            totali += validation_labels.size(0)
 
     validation_los = loss_totale / len(validation_loader)
     accuracy = correct / totali
 
     print(f"Epoca numero {epoch} / {num_epochs}, con loss = {loss.item()}")
     print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
+    print("---------------------------------------------------------------")
 
 #adesso comincia la parte di test
+mlp.eval()
+test_loss = 0.0
+correct_test = 0
+test_totali = 0
+
+with torch.no_grad():
+    for test_images, test_labels in test_loader:
+        prediction_test = mlp(test_images)
+        test_loss += loss_func(prediction_test, test_labels).item()
+        _, valore_predizione_test = torch.max(prediction_test, 1)
+        correct_test += (valore_predizione_test == test_labels).sum().item()
+        test_totali += test_labels.size(0)
+
+    test_accuracy = correct_test / test_totali
+    print(f"Test accuracy = {test_accuracy * 100:.2f}")
