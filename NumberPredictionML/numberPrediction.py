@@ -5,7 +5,7 @@ from torch import nn, save, load
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader, random_split
-import Neuralnetwork #classe della neural network definita da me
+from neuralNetwork import ImageClassifier #classe della neural network definita da me
 
 #definzizione dataset e dataloader per il set di dati per il training - Il full_train_dataset verrà poi suddiviso in train_dataset e validation_dataset
 full_train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=ToTensor()) #train set - train = True
@@ -19,10 +19,10 @@ train_dataset, validation_dataset = random_split(full_train_dataset, [train_size
 
 #definizione dei dataloader, con batch size di 64 per training e validation e 256 per il test
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True) 
-val_loader = DataLoader(validation_dataset, batch_size=64, shuffle=False)
+validation_loader = DataLoader(validation_dataset, batch_size=64, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False) 
 
-mlp = Neuralnetwork() #istanza della rerte neurale creata
+mlp = ImageClassifier() #istanza della rerte neurale creata
 
 #definizione delle loss function e della funzione di ottimizzazione
 loss_func = nn.CrossEntropyLoss() #loss
@@ -33,8 +33,8 @@ num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
     for images, labels in train_loader:
-        prediction = mlp(images)
-        loss = loss_func(prediction, labels)
+        predizione_train = mlp(images)
+        loss = loss_func(predizione_train, labels)
 
         #backpropagation
         optimizer.zero_grad()
@@ -46,11 +46,19 @@ for epoch in range(num_epochs):
     correct = 0
     totali = 0
 
+    #dopo ogni epoca di training il modello esegue una fase di validazione
     with torch.no_grad():
-        for
-    print(f"Epoca numero {epoch}, con loss = {loss.item()}")
+        for images, labels in validation_loader:
+            predizione_validation = mlp(images)
+            loss_totale += loss_func(predizione_validation, labels).item()
+            _, valore_predizione = torch.max(predizione_validation, 1)
+            correct += (valore_predizione == labels).sum().item()
+            totali += labels.size(0)
 
+    validation_los = loss_totale / len(validation_loader)
+    accuracy = correct / totali
 
+    print(f"Epoca numero {epoch} / {num_epochs}, con loss = {loss.item()}")
+    print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
 
-
-
+#adesso comincia la parte di test
