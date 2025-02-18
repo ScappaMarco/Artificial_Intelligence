@@ -82,11 +82,13 @@ for epoch in range(num_epochs):
 #sezione dedicata alla visualizzazione della loss function e dell'accuracy
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
+#grafico loss function
 ax1.plot(range(1, num_epochs + 1), train_losses, label='Training Loss', color='blue', marker='o')
 ax1.set_xlabel('Epoche')
 ax1.set_ylabel('Loss', color='blue')
 ax1.tick_params(axis='y', labelcolor='blue')
 
+#grafico accuracy
 ax2 = ax1.twinx()
 ax2.plot(range(1, num_epochs + 1), validation_accuarcies, label='Training Accuracy', color='red', marker='s')
 ax2.set_ylabel('Accuracy (%)', color='red')
