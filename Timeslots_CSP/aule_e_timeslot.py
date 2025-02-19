@@ -4,8 +4,6 @@ import constraint as csp
 #aule = [{"nome":"nome_aula", "capienza":capienza_aula}]
 #possible_values = [(aula, time_slot)]
 
-timeslots = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 #con questa funzione generiamo il dominio di ogni variabile: queste prendono tutti i valori possibili in base alla durata delle lezione, e in base alla lista dei timsslots
 def crea_dominio(lezioni, aule, timeslot):
     domini = {}
@@ -33,18 +31,20 @@ def vincolo_limita_domini(*assegnazioni):
         if assegnazione is None:
             continue  
 
+        #assegnazione è una coppia (aula, timeslot)
         _, slots = assegnazione
 
         for slot in slots:
             if slot in occupazione:
-                return False  
+                return False  #se lo slot si trova in occupazione allora viene ritornato False
             occupazione[slot] = True  
+            #questo settaggio aiuta a capire quali slot sono occupati
 
     return True 
 
-def resolver(lezioni, aule):
+def resolver(lezioni, aule, timeslot):
     problema = csp.Problem()
-    domini = crea_dominio(lezioni=lezioni, aule=aule, timeslot=timeslots) #timeslots = [1,2,...,9]
+    domini = crea_dominio(lezioni=lezioni, aule=aule, timeslot=timeslot) #timeslots = [1,2,...,9]
 
     for lez in lezioni:
         problema.addVariable(lez["nome_lezione"], domini[lez["nome_lezione"]])
@@ -60,6 +60,8 @@ def resolver(lezioni, aule):
     soluzione = problema.getSolution()
     return soluzione
 
+timeslots = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 lezioni = [
         {"nome_lezione":"Analisi 1", "durata":2, "studenti_previsti":60},
         {"nome_lezione":"Programmazione ad Oggetti", "durata":3, "studenti_previsti":40},
@@ -73,6 +75,6 @@ aule = [
         {"nome_aula":"Aula A1.2", "capienza":40}
     ]
 
-solution = resolver(lezioni=lezioni, aule=aule)
+solution = resolver(lezioni=lezioni, aule=aule, timeslot=timeslots)
 solution.__reversed__()
 print(solution)

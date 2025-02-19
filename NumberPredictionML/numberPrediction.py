@@ -35,8 +35,8 @@ print("INIZIO FASE DI TRAINING E VALIDATION")
 print("---------------------------------------------------------------")
 
 #adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
-train_losses = [] #sarà utile dopo per mostrare il grafico della loss function
-validation_accuarcies = []
+#train_losses = [] #sarà utile dopo per mostrare il grafico della loss function
+#validation_accuarcies = []
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
@@ -52,7 +52,7 @@ for epoch in range(num_epochs):
 
         epoch_train_loss += loss.item()
 
-    train_losses.append(loss.item())
+    #train_losses.append(loss.item())
 
     #qui va la fase di validation
     mlp.eval()
@@ -72,7 +72,7 @@ for epoch in range(num_epochs):
     validation_los = loss_totale / len(validation_loader)
     accuracy = correct / totali
 
-    validation_accuarcies.append(accuracy)
+    #validation_accuarcies.append(accuracy)
 
     print(f"Epoca numero {epoch + 1} / {num_epochs}, con loss = {loss.item()}")
     print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
@@ -113,7 +113,6 @@ test_totali = 0
 with torch.no_grad():
     for test_images, test_labels in test_loader:
         prediction_test = mlp(test_images)
-        test_loss += loss_func(prediction_test, test_labels).item()
         _, valore_predizione_test = torch.max(prediction_test, 1)
         correct_test += (valore_predizione_test == test_labels).sum().item()
         test_totali += test_labels.size(0)
@@ -121,12 +120,13 @@ with torch.no_grad():
     test_accuracy = correct_test / test_totali
     print(f"Test accuracy = {test_accuracy * 100:.2f}")
 
+'''
 #salvataggio modello con wb = write binary
 with open('classification_model.pt', 'wb') as f:
     save(mlp.state_dict(), f)
 
 #codice di prova del modello con delle foto prese dal dataset di MNIST
-'''
+
 transform = Compose([
     Resize((28, 28)),
     Grayscale(num_output_channels=1),  
