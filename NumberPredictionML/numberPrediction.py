@@ -35,8 +35,8 @@ print("INIZIO FASE DI TRAINING E VALIDATION")
 print("---------------------------------------------------------------")
 
 #adesso bisogna creare il ciclo per addestrare la rete neurale tramite n epoche
-#train_losses = [] #sarà utile dopo per mostrare il grafico della loss function
-#validation_accuarcies = []
+train_losses = [] #sarà utile dopo per mostrare il grafico della loss function
+validation_accuarcies = []
 num_epochs = 10 #numero di training steps
 for epoch in range(num_epochs):
     mlp.train()
@@ -52,14 +52,14 @@ for epoch in range(num_epochs):
 
         epoch_train_loss += loss.item()
 
-    #train_losses.append(loss.item())
+    train_losses.append(loss.item())
 
     #qui va la fase di validation
     mlp.eval()
     loss_totale = 0.0
     correct = 0
     totali = 0
-
+    
     #dopo ogni epoca di training il modello esegue una fase di validazione
     with torch.no_grad():
         for validation_images, validation_labels in validation_loader:
@@ -72,13 +72,12 @@ for epoch in range(num_epochs):
     validation_los = loss_totale / len(validation_loader)
     accuracy = correct / totali
 
-    #validation_accuarcies.append(accuracy)
-
+    validation_accuarcies.append(accuracy)
+    #alla fune di ogni epoca faccio il print delle informazioni relative a train loss, validation loss e accuracy
     print(f"Epoca numero {epoch + 1} / {num_epochs}, con loss = {loss.item()}")
     print(f"Validation loss = {validation_los}, e accuracy = {accuracy}%")
     print("---------------------------------------------------------------")
 
-'''
 #sezione dedicata alla visualizzazione della loss function e dell'accuracy
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
@@ -100,7 +99,6 @@ fig.legend(loc='upper right')
 plt.grid(True)
 
 plt.show()
-'''
 
 print("INIZIO FASE DI TESTING")
 print("---------------------------------------------------------------")
