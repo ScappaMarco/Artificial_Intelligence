@@ -1,4 +1,4 @@
-## AI Assignment 25/25
+# AI Assignment 25/25
 ### CSP Assignment Specification
 Implementare il seguente problema adottando il formalismo dei Constraint Satisfaction Problems (CSPs) e utilizzando il package Python 'python-constraint' (https://github.com/python-constraint/python-constraint).
 Il problema da implementare consiste nell'assegnare aule e timeslot a lezioni universitarie *IN UN DATO GIORNO* (solo per un unico giorno).
